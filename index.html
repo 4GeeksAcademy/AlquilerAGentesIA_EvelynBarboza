@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="es" class="h-full scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgentHub SaaS Dashboard</title>
+    <meta
+      name="description"
+      content="Panel de administración de AgentHub para gestionar usuarios, agentes, skills, contratos y errores operativos."
+    />
+    <meta name="robots" content="index,follow" />
+    <meta name="geo.region" content="ES" />
+    <meta name="geo.placename" content="Madrid" />
+
+    <script>
+      tailwind = window.tailwind || {};
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+              body: ["Manrope", "sans-serif"],
+            },
+            boxShadow: {
+              soft: "0 10px 28px -18px rgba(15, 23, 42, 0.7)",
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --header-offset: 84px;
+      }
+
+      body {
+        font-family: "Manrope", sans-serif;
+      }
+
+      .font-display {
+        font-family: "Space Grotesk", sans-serif;
+      }
+
+      .stitch-grid {
+        background-color: #0b1220;
+        background-image:
+          radial-gradient(circle, rgba(148, 163, 184, 0.35) 1px, transparent 1px),
+          radial-gradient(circle at 25% 15%, rgba(59, 130, 246, 0.2), transparent 40%),
+          radial-gradient(circle at 80% 40%, rgba(16, 185, 129, 0.14), transparent 35%);
+        background-size: 20px 20px, auto, auto;
+      }
+
+      .light-grid {
+        background-color: #eef2ff;
+        background-image:
+          radial-gradient(circle, rgba(100, 116, 139, 0.15) 1px, transparent 1px),
+          radial-gradient(circle at 20% 10%, rgba(59, 130, 246, 0.16), transparent 40%),
+          radial-gradient(circle at 80% 90%, rgba(14, 165, 233, 0.12), transparent 35%);
+        background-size: 22px 22px, auto, auto;
+      }
+
+      .tooltip::after {
+        content: attr(data-tip);
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: calc(100% + 8px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        background: #111827;
+        color: #f8fafc;
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-size: 11px;
+        line-height: 1.2;
+        white-space: nowrap;
+        z-index: 30;
+      }
+
+      .tooltip:hover::after,
+      .tooltip:focus-visible::after {
+        opacity: 1;
+      }
+
+      .panel-section {
+        min-height: calc(100vh - var(--header-offset));
+        scroll-margin-top: var(--header-offset);
+      }
+    </style>
+  </head>
+
+  <body class="h-full text-slate-900 transition-colors duration-300 light-grid dark:text-slate-100">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-blue-600 focus:px-3 focus:py-2 focus:text-white"
+      >Saltar al contenido principal</a
+    >
+
+    <div class="min-h-full">
+      <div class="lg:flex">
+        <aside
+          id="sidebar"
+          class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full border-r border-slate-300/40 bg-white/85 p-5 backdrop-blur-md transition-transform duration-300 dark:border-slate-700/60 dark:bg-slate-900/80 lg:translate-x-0"
+          aria-label="Navegacion principal"
+        >
+          <div class="mb-6 flex items-center gap-3">
+            <div class="grid h-10 w-10 place-content-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 text-white">
+              <span class="font-display text-lg font-bold">A</span>
+            </div>
+            <div>
+              <h1 class="font-display text-xl font-bold">AgentHub</h1>
+              <p class="text-xs text-slate-600 dark:text-slate-300">SaaS Dashboard</p>
+            </div>
+          </div>
+
+          <nav class="space-y-1 text-sm font-semibold">
+            <a href="#dashboard" class="block rounded-lg px-3 py-2 transition hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-slate-800">Dashboard</a>
+            <a href="#usuarios" class="block rounded-lg px-3 py-2 transition hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-slate-800">Gestion de usuarios</a>
+            <a href="#agentes" class="block rounded-lg px-3 py-2 transition hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-slate-800">Gestion de agentes</a>
+            <a href="#skills" class="block rounded-lg px-3 py-2 transition hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-slate-800">Skills</a>
+            <a href="#contratos" class="block rounded-lg px-3 py-2 transition hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-slate-800">Contrataciones</a>
+            <a href="#errores" class="block rounded-lg px-3 py-2 transition hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-slate-800">Log de errores</a>
+          </nav>
+        </aside>
+
+        <div class="flex-1 lg:ml-72">
+          <header class="sticky top-0 z-30 border-b border-slate-300/40 bg-white/75 backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-900/70">
+            <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+              <div class="flex items-center gap-2">
+                <button
+                  id="sidebar-toggle"
+                  type="button"
+                  class="rounded-lg border border-slate-300 px-2 py-1.5 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 lg:hidden"
+                  aria-label="Abrir navegacion lateral"
+                >
+                  ☰
+                </button>
+                <div>
+                  <p class="font-display text-lg font-bold sm:text-xl">AgentHub SaaS Dashboard</p>
+                  <p class="text-xs text-slate-600 dark:text-slate-300">Operacion de agentes IA para negocio</p>
+                </div>
+              </div>
+
+              <button
+                id="theme-toggle"
+                type="button"
+                class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                aria-label="Cambiar tema"
+                aria-pressed="false"
+              >
+                <span id="theme-icon" aria-hidden="true">🌙</span>
+                <span id="theme-text">Modo oscuro</span>
+              </button>
+            </div>
+          </header>
+
+          <main id="main-content" class="mx-auto max-w-7xl snap-y snap-proximity space-y-8 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+            <section id="dashboard" class="panel-section snap-start rounded-2xl border border-slate-300/40 bg-white/85 p-4 shadow-soft backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/80 sm:p-5">
+              <div class="mb-4 flex items-center justify-between">
+                <h2 class="font-display text-xl font-bold">Dashboard</h2>
+                <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Resumen mensual</span>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <article class="rounded-xl border border-emerald-200 bg-white p-4 dark:border-emerald-900/60 dark:bg-slate-900">
+                  <div class="mb-2 flex items-center justify-between">
+                    <p class="text-sm font-semibold">Ingresos totales del mes</p>
+                    <span class="rounded-lg bg-emerald-100 px-2 py-1 text-sm dark:bg-emerald-900/30">💸</span>
+                  </div>
+                  <p class="font-display text-3xl font-bold text-emerald-600 dark:text-emerald-400">$124,500</p>
+                </article>
+
+                <article class="rounded-xl border border-rose-200 bg-white p-4 dark:border-rose-900/60 dark:bg-slate-900">
+                  <div class="mb-2 flex items-center justify-between">
+                    <p class="text-sm font-semibold">Perdidas por descuentos</p>
+                    <span class="rounded-lg bg-rose-100 px-2 py-1 text-sm dark:bg-rose-900/30">📉</span>
+                  </div>
+                  <p class="font-display text-3xl font-bold text-rose-600 dark:text-rose-400">$8,900</p>
+                </article>
+
+                <article class="rounded-xl border border-cyan-200 bg-white p-4 dark:border-cyan-900/60 dark:bg-slate-900">
+                  <div class="mb-2 flex items-center justify-between">
+                    <p class="text-sm font-semibold">Agentes activos</p>
+                    <span class="rounded-lg bg-cyan-100 px-2 py-1 text-sm dark:bg-cyan-900/30">🤖</span>
+                  </div>
+                  <p class="font-display text-3xl font-bold text-cyan-600 dark:text-cyan-400">452</p>
+                </article>
+
+                <article class="rounded-xl border border-amber-200 bg-white p-4 dark:border-amber-900/60 dark:bg-slate-900">
+                  <div class="mb-2 flex items-center justify-between">
+                    <p class="text-sm font-semibold">Agentes en fallo</p>
+                    <span class="rounded-lg bg-amber-100 px-2 py-1 text-sm dark:bg-amber-900/30">⚠️</span>
+                  </div>
+                  <p class="font-display text-3xl font-bold text-amber-600 dark:text-amber-400">12</p>
+                </article>
+              </div>
+
+              <div class="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center dark:border-slate-700 dark:bg-slate-800/60">
+                <p class="font-display text-lg font-bold text-slate-500 dark:text-slate-300">[ Placeholder: grafico de actividad semanal ]</p>
+                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Ejecuciones de agentes por dia</p>
+              </div>
+            </section>
+
+            <section id="usuarios" class="panel-section snap-start rounded-2xl border border-slate-300/40 bg-white/85 p-4 shadow-soft backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/80 sm:p-5">
+              <h2 class="mb-4 font-display text-xl font-bold">Gestion de usuarios</h2>
+              <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <table class="min-w-full text-left text-sm">
+                  <thead class="bg-slate-100 dark:bg-slate-800">
+                    <tr>
+                      <th class="px-4 py-3">Nombre</th>
+                      <th class="px-4 py-3">Email</th>
+                      <th class="px-4 py-3">Plan</th>
+                      <th class="px-4 py-3">Estado</th>
+                      <th class="px-4 py-3 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="users-body" class="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-900"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="agentes" class="panel-section snap-start rounded-2xl border border-slate-300/40 bg-white/85 p-4 shadow-soft backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/80 sm:p-5">
+              <h2 class="mb-4 font-display text-xl font-bold">Gestion de agentes</h2>
+              <div id="agents-list" class="space-y-3"></div>
+            </section>
+
+            <section id="skills" class="panel-section snap-start rounded-2xl border border-slate-300/40 bg-white/85 p-4 shadow-soft backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/80 sm:p-5">
+              <h2 class="mb-2 font-display text-xl font-bold">Skills</h2>
+              <p class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-900/50 dark:bg-blue-900/20 dark:text-blue-100">
+                Una skill en AgentHub es una capacidad modular que equipa a un agente para realizar tareas de negocio especificas con mayor precision y contexto.
+              </p>
+              <div id="skills-grid" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
+            </section>
+
+            <section id="contratos" class="panel-section snap-start rounded-2xl border border-slate-300/40 bg-white/85 p-4 shadow-soft backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/80 sm:p-5">
+              <h2 class="mb-4 font-display text-xl font-bold">Contrataciones de agentes</h2>
+              <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <table class="min-w-full text-left text-sm">
+                  <thead class="bg-slate-100 dark:bg-slate-800">
+                    <tr>
+                      <th class="px-4 py-3">Cliente</th>
+                      <th class="px-4 py-3">Agente</th>
+                      <th class="px-4 py-3">Skills contratadas</th>
+                      <th class="px-4 py-3">Fechas</th>
+                      <th class="px-4 py-3">Importe total</th>
+                      <th class="px-4 py-3 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="contracts-body" class="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-900"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="errores" class="panel-section snap-start rounded-2xl border border-slate-300/40 bg-white/85 p-4 shadow-soft backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/80 sm:p-5">
+              <h2 class="mb-4 font-display text-xl font-bold">Log de errores</h2>
+              <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <table class="min-w-full text-left text-sm">
+                  <thead class="bg-slate-100 dark:bg-slate-800">
+                    <tr>
+                      <th class="px-4 py-3">Timestamp</th>
+                      <th class="px-4 py-3">Agente</th>
+                      <th class="px-4 py-3">Tipo</th>
+                      <th class="px-4 py-3">Descripcion</th>
+                      <th class="px-4 py-3">Estado</th>
+                      <th class="px-4 py-3 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="errors-body" class="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-900"></tbody>
+                </table>
+              </div>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-950/50 lg:hidden" aria-hidden="true"></div>
+
+    <div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div id="modal-overlay" class="absolute inset-0 bg-slate-950/60"></div>
+      <article class="relative z-10 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+        <header class="mb-3 flex items-center justify-between border-b border-slate-200 pb-2 dark:border-slate-700">
+          <h3 id="modal-title" class="font-display text-lg font-bold">Detalle</h3>
+          <button id="modal-close" type="button" class="rounded-md px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Cerrar modal">✕</button>
+        </header>
+        <div id="modal-content" class="max-h-[70vh] overflow-auto text-sm"></div>
+      </article>
+    </div>
+
+    <script>
+      const users = [
+        { name: "Ana Garcia", email: "ana@nova.com", plan: "Enterprise", status: "Activo", empresa: "NovaCorp", alta: "2025-09-01", agentes: 34 },
+        { name: "Luis Perez", email: "luis@retailx.io", plan: "Pro", status: "Activo", empresa: "RetailX", alta: "2026-01-15", agentes: 18 },
+        { name: "Marta Gomez", email: "marta@finbox.ai", plan: "Starter", status: "Pendiente", empresa: "FinBox", alta: "2026-03-12", agentes: 4 },
+      ];
+
+      const agents = [
+        {
+          name: "Optima Ventas IA",
+          owner: "NovaCorp",
+          status: "activo",
+          prompt: "Eres un agente de ventas B2B. Prioriza conversion y claridad.",
+          skills: [
+            { name: "Lead Scoring", tip: "Prioriza leads por conversion." },
+            { name: "CRM Sync", tip: "Sincroniza datos en tiempo real." },
+            { name: "Email Draft", tip: "Genera correos de seguimiento." },
+          ],
+        },
+        {
+          name: "SupportOps Alpha",
+          owner: "RetailX",
+          status: "fallando",
+          prompt: "Eres un agente de soporte. Resuelve tickets por SLA.",
+          skills: [
+            { name: "Intent Router", tip: "Clasifica ticket por prioridad." },
+            { name: "Reply Composer", tip: "Redacta respuesta y siguiente paso." },
+          ],
+        },
+        {
+          name: "KPI Watcher",
+          owner: "FinBox",
+          status: "inactivo",
+          prompt: "Monitorea KPIs y alerta desvios operativos criticos.",
+          skills: [
+            { name: "Anomaly Scan", tip: "Detecta anomalias de metrica." },
+            { name: "Exec Summary", tip: "Resume resultados ejecutivos." },
+          ],
+        },
+      ];
+
+      const skills = [
+        { name: "Analisis Predictivo", desc: "Predice demanda y comportamiento.", count: 24, detail: "Modelos de series temporales para negocio." },
+        { name: "Atencion al Cliente", desc: "Automatiza respuestas contextuales.", count: 31, detail: "Soporte omnicanal con tono de marca." },
+        { name: "Deteccion de Fraude", desc: "Identifica patrones de riesgo.", count: 12, detail: "Clasificacion de transacciones sospechosas." },
+        { name: "Rutas Inteligentes", desc: "Optimiza rutas y tiempos.", count: 19, detail: "Minimiza costo logistico y retrasos." },
+        { name: "Control de Calidad", desc: "Evalua consistencia de procesos.", count: 17, detail: "Checklist automatizado por flujo." },
+        { name: "Forecast Financiero", desc: "Estima cashflow y escenarios.", count: 14, detail: "Proyecciones para planificacion estrategica." },
+      ];
+
+      const contracts = [
+        {
+          client: "NovaCorp",
+          agent: "Optima Ventas IA",
+          skills: [
+            { name: "Lead Scoring", price: "$1,200" },
+            { name: "CRM Sync", price: "$900" },
+          ],
+          dates: "01/02/2026 - 01/08/2026",
+          total: "$14,800",
+        },
+        {
+          client: "RetailX",
+          agent: "SupportOps Alpha",
+          skills: [
+            { name: "Intent Router", price: "$850" },
+            { name: "Reply Composer", price: "$750" },
+          ],
+          dates: "10/01/2026 - 10/07/2026",
+          total: "$11,300",
+        },
+      ];
+
+      const errors = [
+        {
+          ts: "2026-06-08 10:43",
+          agent: "SupportOps Alpha",
+          type: "Timeout",
+          severity: "critico",
+          desc: "Tiempo de respuesta excedido en API externa.",
+          trace: "TimeoutError: request exceeded 10000ms at orchestrator.js:88",
+          resolved: false,
+        },
+        {
+          ts: "2026-06-08 09:27",
+          agent: "KPI Watcher",
+          type: "Validacion",
+          severity: "medio",
+          desc: "Schema invalido en payload de metrica.",
+          trace: "ValidationError: field period missing at validator.ts:42",
+          resolved: false,
+        },
+      ];
+
+      const usersBody = document.getElementById("users-body");
+      const agentsList = document.getElementById("agents-list");
+      const skillsGrid = document.getElementById("skills-grid");
+      const contractsBody = document.getElementById("contracts-body");
+      const errorsBody = document.getElementById("errors-body");
+
+      const modal = document.getElementById("modal");
+      const modalTitle = document.getElementById("modal-title");
+      const modalContent = document.getElementById("modal-content");
+      const modalClose = document.getElementById("modal-close");
+      const modalOverlay = document.getElementById("modal-overlay");
+
+      const sidebar = document.getElementById("sidebar");
+      const sidebarToggle = document.getElementById("sidebar-toggle");
+      const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+
+      const themeToggle = document.getElementById("theme-toggle");
+      const themeIcon = document.getElementById("theme-icon");
+      const themeText = document.getElementById("theme-text");
+
+      function statusTag(state) {
+        if (state === "Activo" || state === "activo") return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300";
+        if (state === "Pendiente" || state === "inactivo") return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300";
+        return "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300";
+      }
+
+      function severityTag(level) {
+        if (level === "critico") return "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300";
+        if (level === "medio") return "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300";
+        return "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300";
+      }
+
+      function closeAllMenus() {
+        document.querySelectorAll("[data-menu]").forEach((menu) => menu.classList.add("hidden"));
+      }
+
+      function openModal(title, contentHtml) {
+        modalTitle.textContent = title;
+        modalContent.innerHTML = contentHtml;
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.body.classList.add("overflow-hidden");
+      }
+
+      function closeModal() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        document.body.classList.remove("overflow-hidden");
+      }
+
+      function renderUsers() {
+        usersBody.innerHTML = users
+          .map(
+            (u, i) => `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60" data-kind="user" data-index="${i}">
+              <td class="px-4 py-3 font-semibold">${u.name}</td>
+              <td class="px-4 py-3">${u.email}</td>
+              <td class="px-4 py-3">${u.plan}</td>
+              <td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs font-bold ${statusTag(u.status)}">${u.status}</span></td>
+              <td class="relative px-4 py-3 text-right">
+                <button class="rounded-md px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800" data-trigger aria-label="Abrir acciones">⋮</button>
+                <div class="absolute right-4 top-11 z-20 hidden w-36 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-800" data-menu>
+                  <button class="block w-full rounded-md px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700" data-action="user-view" data-index="${i}">Ver detalle</button>
+                  <button class="block w-full rounded-md px-3 py-2 text-left text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30" data-action="row-delete">Eliminar</button>
+                </div>
+              </td>
+            </tr>`
+          )
+          .join("");
+      }
+
+      function renderAgents() {
+        agentsList.innerHTML = agents
+          .map(
+            (a, i) => `
+            <article class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900" data-kind="agent" data-index="${i}">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="font-display text-lg font-bold">${a.name}</h3>
+                  <p class="text-sm text-slate-600 dark:text-slate-300">Propietario: ${a.owner}</p>
+                  <span class="mt-2 inline-flex rounded-full px-2 py-1 text-xs font-bold ${statusTag(a.status)}">${a.status}</span>
+                </div>
+                <div class="relative">
+                  <button class="rounded-md px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800" data-trigger aria-label="Abrir acciones">⋮</button>
+                  <div class="absolute right-0 top-9 z-20 hidden w-40 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-800" data-menu>
+                    <button class="block w-full rounded-md px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700" data-action="agent-config" data-index="${i}">Configurar</button>
+                    <button class="block w-full rounded-md px-3 py-2 text-left text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30" data-action="card-delete">Eliminar</button>
+                  </div>
+                </div>
+              </div>
+              <button class="mt-3 inline-flex items-center gap-2 text-sm font-bold text-blue-700 hover:text-blue-600 dark:text-blue-300" data-expand aria-expanded="false">▶ Ver skills</button>
+              <div class="max-h-0 overflow-hidden transition-all duration-300" data-expand-content>
+                <div class="mt-2 flex flex-wrap gap-2">
+                  ${a.skills
+                    .map(
+                      (s) =>
+                        `<span tabindex="0" class="tooltip relative rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-200" data-tip="${s.tip}">${s.name}</span>`
+                    )
+                    .join("")}
+                </div>
+              </div>
+            </article>`
+          )
+          .join("");
+      }
+
+      function renderSkills() {
+        skillsGrid.innerHTML = skills
+          .map(
+            (s, i) => `
+            <article class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900" data-kind="skill" data-index="${i}">
+              <div class="mb-2 flex items-start justify-between gap-2">
+                <h3 class="font-display text-base font-bold">${s.name}</h3>
+                <div class="relative">
+                  <button class="rounded-md px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800" data-trigger aria-label="Abrir acciones">⋮</button>
+                  <div class="absolute right-0 top-9 z-20 hidden w-36 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-800" data-menu>
+                    <button class="block w-full rounded-md px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700" data-action="skill-view" data-index="${i}">Ver detalle</button>
+                    <button class="block w-full rounded-md px-3 py-2 text-left text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30" data-action="card-delete">Eliminar</button>
+                  </div>
+                </div>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-300">${s.desc}</p>
+              <p class="mt-2 inline-flex rounded-full bg-cyan-100 px-2 py-1 text-xs font-bold text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300">${s.count} agentes</p>
+            </article>`
+          )
+          .join("");
+      }
+
+      function renderContracts() {
+        contractsBody.innerHTML = contracts
+          .map(
+            (c, i) => `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60" data-kind="contract" data-index="${i}">
+              <td class="px-4 py-3 font-semibold">${c.client}</td>
+              <td class="px-4 py-3">${c.agent}</td>
+              <td class="px-4 py-3">${c.skills.map((k) => k.name).join(", ")}</td>
+              <td class="px-4 py-3">${c.dates}</td>
+              <td class="px-4 py-3 font-bold">${c.total}</td>
+              <td class="relative px-4 py-3 text-right">
+                <button class="rounded-md px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800" data-trigger aria-label="Abrir acciones">⋮</button>
+                <div class="absolute right-4 top-11 z-20 hidden w-36 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-800" data-menu>
+                  <button class="block w-full rounded-md px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700" data-action="contract-view" data-index="${i}">Ver detalle</button>
+                  <button class="block w-full rounded-md px-3 py-2 text-left text-rose-600 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-900/30" data-action="row-delete">Eliminar</button>
+                </div>
+              </td>
+            </tr>`
+          )
+          .join("");
+      }
+
+      function renderErrors() {
+        errorsBody.innerHTML = errors
+          .map(
+            (e, i) => `
+            <tr class="${e.resolved ? "opacity-60" : ""} hover:bg-slate-50 dark:hover:bg-slate-800/60" data-kind="error" data-index="${i}">
+              <td class="px-4 py-3">${e.ts}</td>
+              <td class="px-4 py-3 font-semibold">${e.agent}</td>
+              <td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs font-bold ${severityTag(e.severity)}">${e.type}</span></td>
+              <td class="px-4 py-3">${e.desc}</td>
+              <td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs font-bold ${e.resolved ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"}">${e.resolved ? "Resuelto" : "Pendiente"}</span></td>
+              <td class="relative px-4 py-3 text-right">
+                <button class="rounded-md px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800" data-trigger aria-label="Abrir acciones">⋮</button>
+                <div class="absolute right-4 top-11 z-20 hidden w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-800" data-menu>
+                  <button class="block w-full rounded-md px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700" data-action="error-view" data-index="${i}">Ver detalle</button>
+                  <button class="block w-full rounded-md px-3 py-2 text-left text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-900/30" data-action="error-resolve" data-index="${i}">Marcar como resuelto</button>
+                </div>
+              </td>
+            </tr>`
+          )
+          .join("");
+      }
+
+      document.addEventListener("click", (event) => {
+        const trigger = event.target.closest("[data-trigger]");
+        const clickedMenu = event.target.closest("[data-menu]");
+
+        if (trigger) {
+          const menu = trigger.parentElement.querySelector("[data-menu]");
+          const open = !menu.classList.contains("hidden");
+          closeAllMenus();
+          if (!open) menu.classList.remove("hidden");
+        } else if (!clickedMenu) {
+          closeAllMenus();
+        }
+
+        const actionBtn = event.target.closest("[data-action]");
+        if (!actionBtn) return;
+
+        const action = actionBtn.dataset.action;
+        const idx = Number(actionBtn.dataset.index);
+
+        if (action === "user-view") {
+          const user = users[idx];
+          openModal(
+            "Detalle de usuario",
+            `<div class="grid grid-cols-1 gap-2 sm:grid-cols-2"><p><strong>Nombre:</strong> ${user.name}</p><p><strong>Email:</strong> ${user.email}</p><p><strong>Empresa:</strong> ${user.empresa}</p><p><strong>Plan:</strong> ${user.plan}</p><p><strong>Estado:</strong> ${user.status}</p><p><strong>Agentes activos:</strong> ${user.agentes}</p><p><strong>Fecha de alta:</strong> ${user.alta}</p></div>`
+          );
+        }
+
+        if (action === "agent-config") {
+          const agent = agents[idx];
+          openModal("Configurar agente", `<p class="mb-2"><strong>${agent.name}</strong></p><pre class="rounded-lg bg-slate-100 p-3 text-sm dark:bg-slate-800">${agent.prompt}</pre>`);
+        }
+
+        if (action === "skill-view") {
+          const skill = skills[idx];
+          openModal("Detalle de skill", `<p><strong>Nombre:</strong> ${skill.name}</p><p class="mt-1"><strong>Descripcion:</strong> ${skill.detail}</p><p class="mt-1"><strong>Agentes que la usan:</strong> ${skill.count}</p>`);
+        }
+
+        if (action === "contract-view") {
+          const c = contracts[idx];
+          openModal(
+            "Detalle de contrato",
+            `<p><strong>Cliente:</strong> ${c.client}</p><p><strong>Agente:</strong> ${c.agent}</p><p><strong>Fechas:</strong> ${c.dates}</p><p><strong>Total:</strong> ${c.total}</p><h4 class="mt-3 font-display font-bold">Desglose de skills</h4><ul class="mt-2 space-y-1">${c.skills
+              .map((k) => `<li class="flex items-center justify-between rounded-md bg-slate-100 px-3 py-2 dark:bg-slate-800"><span>${k.name}</span><span class="font-bold">${k.price}</span></li>`)
+              .join("")}</ul>`
+          );
+        }
+
+        if (action === "error-view") {
+          const e = errors[idx];
+          openModal("Traza completa del error", `<p><strong>Tipo:</strong> ${e.type}</p><p class="mb-2"><strong>Timestamp:</strong> ${e.ts}</p><pre class="rounded-lg bg-slate-100 p-3 text-sm dark:bg-slate-800">${e.trace}</pre>`);
+        }
+
+        if (action === "error-resolve") {
+          errors[idx].resolved = true;
+          renderErrors();
+        }
+
+        if (action === "row-delete") {
+          const row = actionBtn.closest("tr");
+          if (row) row.remove();
+        }
+
+        if (action === "card-delete") {
+          const card = actionBtn.closest("article");
+          if (card) card.remove();
+        }
+
+        closeAllMenus();
+      });
+
+      document.addEventListener("click", (event) => {
+        const expander = event.target.closest("[data-expand]");
+        if (!expander) return;
+
+        const card = expander.closest("article");
+        const panel = card.querySelector("[data-expand-content]");
+        const isOpen = expander.getAttribute("aria-expanded") === "true";
+
+        expander.setAttribute("aria-expanded", String(!isOpen));
+        expander.textContent = isOpen ? "▶ Ver skills" : "▼ Ocultar skills";
+        panel.style.maxHeight = isOpen ? "0px" : `${panel.scrollHeight}px`;
+      });
+
+      modalClose.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", closeModal);
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeModal();
+          closeAllMenus();
+        }
+      });
+
+      sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.remove("-translate-x-full");
+        sidebarBackdrop.classList.remove("hidden");
+      });
+
+      sidebarBackdrop.addEventListener("click", () => {
+        sidebar.classList.add("-translate-x-full");
+        sidebarBackdrop.classList.add("hidden");
+      });
+
+      document.querySelectorAll("aside a[href^='#']").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth < 1024) {
+            sidebar.classList.add("-translate-x-full");
+            sidebarBackdrop.classList.add("hidden");
+          }
+        });
+      });
+
+      function applyTheme(mode) {
+        const root = document.documentElement;
+        const body = document.body;
+        const dark = mode === "dark";
+        root.classList.toggle("dark", dark);
+        body.classList.toggle("stitch-grid", dark);
+        body.classList.toggle("light-grid", !dark);
+        themeIcon.textContent = dark ? "☀️" : "🌙";
+        themeText.textContent = dark ? "Modo claro" : "Modo oscuro";
+        themeToggle.setAttribute("aria-pressed", String(dark));
+      }
+
+      const storedTheme = localStorage.getItem("agenthub-theme");
+      const initialTheme =
+        storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      applyTheme(initialTheme);
+
+      themeToggle.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.contains("dark");
+        const next = isDark ? "light" : "dark";
+        localStorage.setItem("agenthub-theme", next);
+        applyTheme(next);
+      });
+
+      renderUsers();
+      renderAgents();
+      renderSkills();
+      renderContracts();
+      renderErrors();
+      
+    </script>
+  </body>
+</html>
